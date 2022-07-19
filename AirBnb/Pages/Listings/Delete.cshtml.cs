@@ -7,35 +7,36 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using AirBnb.Data;
 using AirBnb.Models;
+using AirBnb.Repository.Interfaces;
 
 namespace AirBnb.Pages.Listings
 {
     public class DeleteModel : PageModel
     {
-        private readonly AirBnb.Data.Airbnb2022Context _context;
+        private readonly IListingsRepository _repository;
 
-        public DeleteModel(AirBnb.Data.Airbnb2022Context context)
+        public DeleteModel(IListingsRepository listingsRepository)
         {
-            _context = context;
+            _repository = listingsRepository;
         }
 
         [BindProperty]
-      public Listing Listing { get; set; } = default!;
+        public Listing Listing { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Listings == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var listing = await _context.Listings.FirstOrDefaultAsync(m => m.Id == id);
+            var listing = await _repository.Find(id);
 
             if (listing == null)
             {
                 return NotFound();
             }
-            else 
+            else
             {
                 Listing = listing;
             }
@@ -44,17 +45,16 @@ namespace AirBnb.Pages.Listings
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null || _context.Listings == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var listing = await _context.Listings.FindAsync(id);
+            var listing = await _repository.Find(id);
 
             if (listing != null)
             {
                 Listing = listing;
-                _context.Listings.Remove(Listing);
-                await _context.SaveChangesAsync();
+                await _repository.Delete(Listing);
             }
 
             return RedirectToPage("./Index");
