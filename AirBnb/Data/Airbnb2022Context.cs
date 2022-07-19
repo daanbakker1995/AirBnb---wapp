@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using AirBnb.Models;
 
 namespace AirBnb.Data
@@ -21,6 +18,7 @@ namespace AirBnb.Data
         public virtual DbSet<Neighbourhood> Neighbourhoods { get; set; } = null!;
         public virtual DbSet<Review> Reviews { get; set; } = null!;
 
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -29,12 +27,11 @@ namespace AirBnb.Data
             }
         }
 
+        // Generated with database-scaffolding
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Listing>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("listings");
 
                 entity.Property(e => e.Availability365).HasColumnName("availability_365");
@@ -88,11 +85,9 @@ namespace AirBnb.Data
 
             modelBuilder.Entity<Neighbourhood>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("neighbourhoods");
 
-                entity.Property(e => e.Neighbourhood1)
+                entity.Property(e => e.NeighbourhoodName)
                     .HasMaxLength(50)
                     .HasColumnName("neighbourhood");
 

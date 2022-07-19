@@ -1,0 +1,114 @@
+﻿@page
+@model AirBnb.Pages.Listings.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Listing</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Listing.Name" class="control-label"></label>
+                <input asp-for="Listing.Name" class="form-control" />
+                <span asp-validation-for="Listing.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.HostId" class="control-label"></label>
+                <input asp-for="Listing.HostId" class="form-control" />
+                <span asp-validation-for="Listing.HostId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.HostName" class="control-label"></label>
+                <input asp-for="Listing.HostName" class="form-control" />
+                <span asp-validation-for="Listing.HostName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.NeighbourhoodGroup" class="control-label"></label>
+                <input asp-for="Listing.NeighbourhoodGroup" class="form-control" />
+                <span asp-validation-for="Listing.NeighbourhoodGroup" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.Neighbourhood" class="control-label"></label>
+                <input asp-for="Listing.Neighbourhood" class="form-control" />
+                <span asp-validation-for="Listing.Neighbourhood" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.Latitude" class="control-label"></label>
+                <input asp-for="Listing.Latitude" class="form-control" />
+                <span asp-validation-for="Listing.Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.Longitude" class="control-label"></label>
+                <input asp-for="Listing.Longitude" class="form-control" />
+                <span asp-validation-for="Listing.Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.RoomType" class="control-label"></label>
+                <input asp-for="Listing.RoomType" class="form-control" />
+                <span asp-validation-for="Listing.RoomType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.Price" class="control-label"></label>
+                <input asp-for="Listing.Price" class="form-control" />
+                <span asp-validation-for="Listing.Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.MinimumNights" class="control-label"></label>
+                <input asp-for="Listing.MinimumNights" class="form-control" />
+                <span asp-validation-for="Listing.MinimumNights" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.NumberOfReviews" class="control-label"></label>
+                <input asp-for="Listing.NumberOfReviews" class="form-control" />
+                <span asp-validation-for="Listing.NumberOfReviews" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.LastReview" class="control-label"></label>
+                <input asp-for="Listing.LastReview" class="form-control" />
+                <span asp-validation-for="Listing.LastReview" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.ReviewsPerMonth" class="control-label"></label>
+                <input asp-for="Listing.ReviewsPerMonth" class="form-control" />
+                <span asp-validation-for="Listing.ReviewsPerMonth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.CalculatedHostListingsCount" class="control-label"></label>
+                <input asp-for="Listing.CalculatedHostListingsCount" class="form-control" />
+                <span asp-validation-for="Listing.CalculatedHostListingsCount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.Availability365" class="control-label"></label>
+                <input asp-for="Listing.Availability365" class="form-control" />
+                <span asp-validation-for="Listing.Availability365" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.NumberOfReviewsLtm" class="control-label"></label>
+                <input asp-for="Listing.NumberOfReviewsLtm" class="form-control" />
+                <span asp-validation-for="Listing.NumberOfReviewsLtm" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Listing.License" class="control-label"></label>
+                <input asp-for="Listing.License" class="form-control" />
+                <span asp-validation-for="Listing.License" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
