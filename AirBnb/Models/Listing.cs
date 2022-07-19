@@ -11,7 +11,6 @@ namespace AirBnb.Models
         public string Name { get; set; } = null!;
         public int HostId { get; set; }
         public string HostName { get; set; } = null!;
-        public string? NeighbourhoodGroup { get; set; }
         public string Neighbourhood { get; set; } = null!;
         public double Latitude { get; set; }
         public double Longitude { get; set; }

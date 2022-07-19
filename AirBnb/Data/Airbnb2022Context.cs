@@ -68,8 +68,6 @@ namespace AirBnb.Data
                     .IsUnicode(false)
                     .HasColumnName("neighbourhood");
 
-                entity.Property(e => e.NeighbourhoodGroup).HasColumnName("neighbourhood_group");
-
                 entity.Property(e => e.NumberOfReviews).HasColumnName("number_of_reviews");
 
                 entity.Property(e => e.NumberOfReviewsLtm).HasColumnName("number_of_reviews_ltm");
