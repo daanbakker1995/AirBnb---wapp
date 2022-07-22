@@ -24,7 +24,7 @@ namespace AirBnb.Pages.Listings
 
         public async Task OnGetAsync()
         {
-            Listing = await _repository.GetAllAsync();
+            Listing = await _repository.GetOverViewListingsDataAsync();
         }
     }
 }

@@ -2,12 +2,235 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
-    var data = "";
 }
 
 <div class="row flex-fill d-flex h-100">
-
+    <div id="filter" class="col-4 h-100">
+        <form asp-page="./Index" method="get">
+            <div class="form-group">
+                <input type="text" name="Neighbourhood" value="@Model.FilterOptions.Neighbourhood" />
+            </div>
+            <div class="form-group">
+                <input type="text" name="RoomType" value="@Model.FilterOptions.RoomType" />
+            </div>
+            <div class="form-group">
+                <input type="number" name="MinPrice" value="@Model.FilterOptions.MinPrice" />
+            </div>
+            <div class="form-group">
+                <input type="number" name="MaxPrice" value="@Model.FilterOptions.MaxPrice" />
+            </div>
+            <div class="form-group">
+                <input type="number" name="MinReviews" value="@Model.FilterOptions.MinReviews" />
+            </div>
+            <div class="form-group">
+                <input type="number" name="MaxReviews" value="@Model.FilterOptions.MaxReviews" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Filter" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
     <div id='map' class='col-8 h-100' style='min-width: 800px; min-height: 600px;'></div>
-    <div id="info" class="col-8 h1-100 bg-secondary"><p>Info</p></div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Listings[0].HostName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Listings[0].Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Listings[0].Longitude)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Listings[0].Latitude)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var listing in Model.Listings)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => listing.HostName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => listing.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => listing.Longitude)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => listing.Latitude)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicW91eW0iLCJhIjoiY2thNm44MnV3MDhrdzJybDdyZ25taWZzdiJ9.TeswIM_AHz6PsntAVngmIA';
+        var data =
+        {
+            "type": "FeatureCollection",
+            "features": @Html.Raw(Json.Serialize(@Model.GeoData))
+                        };
+
+        console.log(data);
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/outdoors-v11',
+            zoom: 11,
+            center: [4.895168, 52.370216],
+        });
+
+        map.addControl(new mapboxgl.NavigationControl());
+        map.addControl(new mapboxgl.FullscreenControl());
+
+        map.on('load', function () {
+            map.addSource('listings', {
+                type: 'geojson',
+                // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
+                // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+                data: data,
+                cluster: true,
+                clusterMaxZoom: 14, // Max zoom to cluster points on
+                clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+            });
+
+            map.addLayer({
+                id: 'clusters',
+                type: 'circle',
+                source: 'listings',
+                filter: ['has', 'point_count'],
+                paint: {
+                    // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+                    // with three steps to implement three types of circles:
+                    //   * Blue, 20px circles when point count is less than 100
+                    //   * Yellow, 30px circles when point count is between 100 and 750
+                    //   * Pink, 40px circles when point count is greater than or equal to 750
+                    'circle-color': [
+                        'step',
+                        ['get', 'point_count'],
+                        '#51bbd6',
+                        100,
+                        '#f1f075',
+                        750,
+                        '#f28cb1'
+                    ],
+                    'circle-radius': [
+                        'step',
+                        ['get', 'point_count'],
+                        20,
+                        100,
+                        30,
+                        750,
+                        40
+                    ]
+                }
+            });
+
+            map.addLayer({
+                id: 'cluster-count',
+                type: 'symbol',
+                source: 'listings',
+                filter: ['has', 'point_count'],
+                layout: {
+                    'text-field': '{point_count_abbreviated}',
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                    'text-size': 12
+                }
+            });
+
+            map.addLayer({
+                id: 'unclustered-point',
+                type: 'circle',
+                source: 'listings',
+                filter: ['!', ['has', 'point_count']],
+                paint: {
+                    //'circle-color': '#3bb2d0',
+                    'circle-color': [
+                        'match',
+                        ['get', 'roomType'],
+                        'Entire home/apt',
+                        '#ec5342',
+                        'Private room',
+                        '#54b211',
+                        'Shared room',
+                        '#3bb2d0',
+                        '#ccc' /* Other */
+                    ],
+                    'circle-radius': 4,
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            // inspect a cluster on click
+            map.on('click', 'clusters', (e) => {
+                const features = map.queryRenderedFeatures(e.point, {
+                    layers: ['clusters']
+                });
+                const clusterId = features[0].properties.cluster_id;
+                map.getSource('listings').getClusterExpansionZoom(
+                    clusterId,
+                    (err, zoom) => {
+                        if (err) return;
+
+                        map.easeTo({
+                            center: features[0].geometry.coordinates,
+                            zoom: zoom
+                        });
+                    }
+                );
+            });
+
+            // When a click event occurs on a feature in
+            // the unclustered-point layer, open a popup at
+            // the location of the feature, with
+            // description HTML from its properties.
+            map.on('click', 'unclustered-point', (e) => {
+                var coordinates = e.features[0].geometry.coordinates.slice();
+                const properties = e.features[0].properties;
+
+                console.log(properties);
+
+                var licenceString = properties.hasLicense ? "Yes" : "No";
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(
+                        '<p><strong>' +
+                            '<a target="_blank" href="http://www.airbnb.com/rooms/' + properties.listingId + '">' + properties.name + '</a>' +
+                            ' by ' +
+                            '<a target="_blank" href="http://www.airbnb.com/users/show/' + properties.hostId + '">' + properties.hostName + '</a>' +
+                            ' (' + properties.numberOfReviews + ' reviews)' +
+                        '</strong></p>' +
+                        '<p>' + properties.roomType + ' in ' + properties.neighbourhood + '</p>' +
+                        '<hr>' +
+                        '<p>' +
+                            'License: ' + licenceString + '<br>' +
+                            'Minimum nights: ' + properties.minimunNights + '<br>' +
+                            'Price: ' + properties.price + ' per night' +
+                        '</p>'
+                    )
+                    .addTo(map);
+            });
+
+            map.on('mouseenter', 'clusters', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseenter', 'unclustered-point', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'clusters', () => {
+                map.getCanvas().style.cursor = '';
+            });
+            map.on('mouseleave', 'unclustered-point', () => {
+                map.getCanvas().style.cursor = '';
+            });
+        });
+    </script>
 </div>
