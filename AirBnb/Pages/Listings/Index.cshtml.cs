@@ -7,24 +7,39 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using AirBnb.Data;
 using AirBnb.Models;
-using AirBnb.Repository.Interfaces;
 
 namespace AirBnb.Pages.Listings
 {
     public class IndexModel : PageModel
     {
-        private readonly IListingsRepository _repository;
+        private readonly AirBnb.Data.AirbnbV2Context _context;
 
-        public IndexModel(IListingsRepository listingsRepository)
+        public IndexModel(AirBnb.Data.AirbnbV2Context context)
         {
-            _repository = listingsRepository;
+            _context = context;
         }
 
-        public IList<Listing> Listing { get; set; } = default!;
+        public IList<ListingViewModel> Listing { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Listing = await _repository.GetOverViewListingsDataAsync();
+            if (_context.Listings != null)
+            {
+                var listings = await _context.Listings.Select(x => new ListingViewModel
+                {
+                    Id = x.Id,
+                    HostId = x.HostId,
+                    Name = x.Name,
+                    HostName = x.HostName,
+                    Neighbourhood = x.Neighbourhood,
+                    PropertyType = x.PropertyType,
+                    RoomType = x.RoomType,
+                    Price = x.Price,
+                    MinimumNights = x.MinimumNights,
+                    MaximumNights = x.MaximumNights
+                }).ToListAsync();
+                Listing = listings;
+            }
         }
     }
 }

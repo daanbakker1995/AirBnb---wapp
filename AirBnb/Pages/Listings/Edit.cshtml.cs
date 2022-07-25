@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AirBnb.Data;
 using AirBnb.Models;
@@ -8,9 +13,9 @@ namespace AirBnb.Pages.Listings
 {
     public class EditModel : PageModel
     {
-        private readonly Airbnb2022Context _context;
+        private readonly AirBnb.Data.AirbnbV2Context _context;
 
-        public EditModel(Airbnb2022Context context)
+        public EditModel(AirBnb.Data.AirbnbV2Context context)
         {
             _context = context;
         }

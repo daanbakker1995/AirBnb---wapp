@@ -14,9 +14,9 @@ namespace AirBnb.Data
         {
         }
 
-        public virtual DbSet<Listing> Listings { get; set; } = null!;
-        public virtual DbSet<Neighbourhood> Neighbourhoods { get; set; } = null!;
-        public virtual DbSet<Review> Reviews { get; set; } = null!;
+        public virtual DbSet<Listing1> Listings { get; set; } = null!;
+        public virtual DbSet<Neighbourhood1> Neighbourhoods { get; set; } = null!;
+        public virtual DbSet<Review1> Reviews { get; set; } = null!;
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -30,7 +30,7 @@ namespace AirBnb.Data
         // Generated with database-scaffolding
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Listing>(entity =>
+            modelBuilder.Entity<Listing1>(entity =>
             {
                 entity.ToTable("listings");
 
@@ -81,7 +81,7 @@ namespace AirBnb.Data
                     .HasColumnName("room_type");
             });
 
-            modelBuilder.Entity<Neighbourhood>(entity =>
+            modelBuilder.Entity<Neighbourhood1>(entity =>
             {
                 entity.ToTable("neighbourhoods");
 
@@ -94,7 +94,7 @@ namespace AirBnb.Data
                     .HasColumnName("neighbourhood_group");
             });
 
-            modelBuilder.Entity<Review>(entity =>
+            modelBuilder.Entity<Review1>(entity =>
             {
                 entity.HasNoKey();
 

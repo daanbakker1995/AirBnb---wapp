@@ -1,75 +1,20 @@
 ﻿using AirBnb.Data;
 using AirBnb.Models;
 using AirBnb.Repository.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 namespace AirBnb.Repository
 {
     public class ListingsRepository : BaseRepository<Listing>, IListingsRepository
     {
-        public ListingsRepository(Airbnb2022Context context) : base(context)
+        public ListingsRepository(AirbnbV2Context context) : base(context)
         {
-        }
-
-        public async Task<List<Listing>> GetOverViewListingsDataAsync(ListingsFilterOptions options = null)
-        {
-            var listings = _set.Select(l => new Listing
-            {
-                Id = l.Id,
-                Name = l.Name,
-                HostName = l.HostName,
-                Neighbourhood = l.Neighbourhood,
-                Latitude = l.Latitude,
-                Longitude = l.Longitude,
-                RoomType = l.RoomType,
-                Price = l.Price,
-                NumberOfReviews = l.NumberOfReviews,
-                Availability365 = l.Availability365
-            });
-            if (options != null)
-            {
-                listings = await FilterListings(listings, options);
-            }
-            return await listings.ToListAsync();
         }
 
         public async Task<List<GeoData>> GetListingsGeoData(ListingsFilterOptions filterOptions = null)
         {
-            var listings = await FilterListings(_set.AsNoTracking(), filterOptions);
+            var listings = _set.AsNoTracking(); // TODO: remove take
 
-            var geoDatas = new List<GeoData>();
-            foreach (var item in await listings.ToListAsync())
-            {
-                var geoData = new GeoData
-                {
-                    Properties = new Properties
-                    {
-                        ListingId = item.Id,
-                        Name = item.Name,
-                        HostId = item.HostId,
-                        HostName = item.HostName,
-                        Neighbourhood = item.Neighbourhood,
-                        RoomType = item.RoomType,
-                        NumberOfReviews = item.NumberOfReviews,
-                        MinimunNights = item.MinimumNights,
-                        Price = item.Price
-                    }
-                };
-                if (item.License != null)
-                {
-                    geoData.Properties.HasLicense = true;
-                }
-                geoData.Geometry.Coordinates.Add(GetLongitudeCorrectValue(item.Longitude.ToString()));
-                geoData.Geometry.Coordinates.Add(GetLatitudeCorrectValue(item.Latitude.ToString()));
-                geoDatas.Add(geoData);
-            }
-            return geoDatas;
-        }
-
-        public async Task<IQueryable<Listing>> FilterListings(IQueryable<Listing> listings, ListingsFilterOptions filterOptions)
-        {
             if (filterOptions != null)
             {
                 if (filterOptions.Neighbourhood != null)
@@ -97,32 +42,34 @@ namespace AirBnb.Repository
                     listings = listings.Where(x => x.NumberOfReviews < filterOptions.MaxReviews);
                 }
             }
-            return listings;
-        }
 
-        private static string GetLatitudeCorrectValue(string lat)
-        {
-            return AddDotToString(lat, 1);
-        }
-
-        private static string GetLongitudeCorrectValue(string longitude)
-        {
-            return AddDotToString(longitude, 0);
-        }
-
-        private static string AddDotToString(string value, int afterPosition)
-        {
-            var stringbuilder = new StringBuilder();
-            var characters = value.ToCharArray();
-            for (int i = 0; i < characters.Length; i++)
+            var geoDatas = new List<GeoData>();
+            foreach (var item in await listings.Take(100)
+                .Select(l => new { l.Id, l.Name, l.ListingUrl, l.HostId, l.HostName, l.Neighbourhood, l.RoomType, l.NumberOfReviews, l.MinimumNights, l.Price, l.License, l.Latitude,l.Longitude })
+                .ToListAsync())
             {
-                stringbuilder.Append(characters[i]);
-                if (i == afterPosition)
+                var geoData = new GeoData
                 {
-                    stringbuilder.Append('.');
-                }
+                    Properties = new Properties
+                    {
+                        ListingId = item.Id,
+                        Listing_url = item.ListingUrl,
+                        Name = item.Name,
+                        HostId = item.HostId,
+                        HostName = item.HostName,
+                        Neighbourhood = item.Neighbourhood,
+                        RoomType = item.RoomType,
+                        NumberOfReviews = item.NumberOfReviews ?? default,
+                        MinimunNights = item.MinimumNights ?? default,
+                        Price = item.Price ?? default,
+                        HasLicense = item.License is not null,
+                    }
+                };
+                geoData.Geometry.Coordinates.Add(item.Longitude.ToString().Replace(",", "."));
+                geoData.Geometry.Coordinates.Add(item.Latitude.ToString().Replace(",", "."));
+                geoDatas.Add(geoData);
             }
-            return stringbuilder.ToString();
+            return geoDatas;
         }
     }
 }

@@ -5,69 +5,41 @@
 }
 
 <div class="row flex-fill d-flex h-100">
+    <div id='map' class='col-8 h-100' style='min-width: 800px; min-height: 600px;'></div>
+
     <div id="filter" class="col-4 h-100">
         <form asp-page="./Index" method="get">
             <div class="form-group">
-                <input type="text" name="Neighbourhood" value="@Model.FilterOptions.Neighbourhood" />
+                <label for="neighbourhoodSelection">Filter by neighbourhood:</label>
+                <select name="neighbourhood" class="form-control" id="neighbourhoodSelection" value="@Model.FilterOptions.Neighbourhood">
+                    <option>Amsterdam</option>
+                    @foreach (var neighbourhood in Model.Neighbourhoods)
+                    {
+                        <option>@Html.DisplayFor(modelItem => neighbourhood)</option>
+                    }
+                </select>
             </div>
             <div class="form-group">
-                <input type="text" name="RoomType" value="@Model.FilterOptions.RoomType" />
+                <label for="MinPrice">Min price:</label>
+                <input type="number" id="MinPrice" name="MinPrice" value="@Model.FilterOptions.MinPrice" />
             </div>
             <div class="form-group">
-                <input type="number" name="MinPrice" value="@Model.FilterOptions.MinPrice" />
+                <label for="MaxPrice">Max price:</label>
+                <input type="number" id="MaxPrice" name="MaxPrice" value="@Model.FilterOptions.MaxPrice" />
             </div>
             <div class="form-group">
-                <input type="number" name="MaxPrice" value="@Model.FilterOptions.MaxPrice" />
+                <label for="MinReviews">Min Reviews:</label>
+                <input type="number" id="MinReviews" name="MinReviews" value="@Model.FilterOptions.MinReviews" />
             </div>
             <div class="form-group">
-                <input type="number" name="MinReviews" value="@Model.FilterOptions.MinReviews" />
-            </div>
-            <div class="form-group">
-                <input type="number" name="MaxReviews" value="@Model.FilterOptions.MaxReviews" />
+                <label for="MaxReviews">Max Reviews:</label>
+                <input type="number" id="MaxReviews" name="MaxReviews" value="@Model.FilterOptions.MaxReviews" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Filter" class="btn btn-primary" />
             </div>
         </form>
     </div>
-    <div id='map' class='col-8 h-100' style='min-width: 800px; min-height: 600px;'></div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Listings[0].HostName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Listings[0].Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Listings[0].Longitude)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Listings[0].Latitude)
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var listing in Model.Listings)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => listing.HostName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => listing.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => listing.Longitude)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => listing.Latitude)
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoicW91eW0iLCJhIjoiY2thNm44MnV3MDhrdzJybDdyZ25taWZzdiJ9.TeswIM_AHz6PsntAVngmIA';
@@ -75,7 +47,7 @@
         {
             "type": "FeatureCollection",
             "features": @Html.Raw(Json.Serialize(@Model.GeoData))
-                        };
+                                        };
 
         console.log(data);
 
@@ -92,8 +64,6 @@
         map.on('load', function () {
             map.addSource('listings', {
                 type: 'geojson',
-                // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-                // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
                 data: data,
                 cluster: true,
                 clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -162,7 +132,7 @@
                         '#3bb2d0',
                         '#ccc' /* Other */
                     ],
-                    'circle-radius': 4,
+                    'circle-radius': 8,
                     'circle-stroke-width': 1,
                     'circle-stroke-color': '#fff'
                 }
@@ -199,21 +169,20 @@
 
                 var licenceString = properties.hasLicense ? "Yes" : "No";
 
-                new mapboxgl.Popup()
-                    .setLngLat(coordinates)
+                new mapboxgl.Popup().setLngLat(coordinates)
                     .setHTML(
                         '<p><strong>' +
-                            '<a target="_blank" href="http://www.airbnb.com/rooms/' + properties.listingId + '">' + properties.name + '</a>' +
-                            ' by ' +
-                            '<a target="_blank" href="http://www.airbnb.com/users/show/' + properties.hostId + '">' + properties.hostName + '</a>' +
-                            ' (' + properties.numberOfReviews + ' reviews)' +
+                        '<a target="_blank" href="http://www.airbnb.com/rooms/' + properties.listingId + '">' + properties.name + '</a>' +
+                        ' by ' +
+                        '<a target="_blank" href="http://www.airbnb.com/users/show/' + properties.hostId + '">' + properties.hostName + '</a>' +
+                        ' (' + properties.numberOfReviews + ' reviews)' +
                         '</strong></p>' +
                         '<p>' + properties.roomType + ' in ' + properties.neighbourhood + '</p>' +
                         '<hr>' +
                         '<p>' +
-                            'License: ' + licenceString + '<br>' +
-                            'Minimum nights: ' + properties.minimunNights + '<br>' +
-                            'Price: ' + properties.price + ' per night' +
+                        'License: ' + licenceString + '<br>' +
+                        'Minimum nights: ' + properties.minimunNights + '<br>' +
+                        'Price: ' + properties.price + ' per night' +
                         '</p>'
                     )
                     .addTo(map);

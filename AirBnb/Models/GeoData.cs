@@ -24,7 +24,8 @@
         public string RoomType { get; set; }
         public int NumberOfReviews { get; set; }
         public int MinimunNights { get; set; }
-        public int Price { get; set; }
+        public double Price { get; set; }
         public bool HasLicense { get; set; } = false;
+        public string Listing_url { get; internal set; }
     }
 }

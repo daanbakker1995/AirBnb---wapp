@@ -1,17 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using AirBnb.Data;
 using AirBnb.Repository;
 using AirBnb.Repository.Interfaces;
+using AirBnb.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddDbContext<Airbnb2022Context>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("AirBnbContext") ?? throw new InvalidOperationException("Connection string 'AirBnbContext' not found.")));
+//builder.Services.AddDbContext<Airbnb2022Context>(options =>
+//        options.UseSqlServer(builder.Configuration.GetConnectionString("AirBnbContext") ?? throw new InvalidOperationException("Connection string 'AirBnbContext' not found.")));
+builder.Services.AddDbContext<AirbnbV2Context>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("Airbnb_v2Context") ?? throw new InvalidOperationException("Connection string 'AirbnbV2Context' not found.")));
 
 builder.Services.AddScoped<IListingsRepository, ListingsRepository>();
+builder.Services.AddScoped<INeighbourhoodsRepository, NeighbourhoodsRepository>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 
 var app = builder.Build();
 

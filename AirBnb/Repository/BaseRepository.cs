@@ -6,11 +6,11 @@ namespace AirBnb.Repository
 {
     public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        private readonly Airbnb2022Context _context;
+        private readonly AirbnbV2Context _context;
 
         protected DbSet<TEntity> _set => _context.Set<TEntity>();
 
-        public BaseRepository(Airbnb2022Context context)
+        public BaseRepository(AirbnbV2Context context)
         {
             _context = context;
         }

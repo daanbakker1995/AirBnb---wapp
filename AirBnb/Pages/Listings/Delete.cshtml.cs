@@ -7,36 +7,35 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using AirBnb.Data;
 using AirBnb.Models;
-using AirBnb.Repository.Interfaces;
 
 namespace AirBnb.Pages.Listings
 {
     public class DeleteModel : PageModel
     {
-        private readonly IListingsRepository _repository;
+        private readonly AirBnb.Data.AirbnbV2Context _context;
 
-        public DeleteModel(IListingsRepository listingsRepository)
+        public DeleteModel(AirBnb.Data.AirbnbV2Context context)
         {
-            _repository = listingsRepository;
+            _context = context;
         }
 
         [BindProperty]
-        public Listing Listing { get; set; } = default!;
+      public Listing Listing { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Listings == null)
             {
                 return NotFound();
             }
 
-            var listing = await _repository.Find(id);
+            var listing = await _context.Listings.FirstOrDefaultAsync(m => m.Id == id);
 
             if (listing == null)
             {
                 return NotFound();
             }
-            else
+            else 
             {
                 Listing = listing;
             }
@@ -45,16 +44,17 @@ namespace AirBnb.Pages.Listings
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Listings == null)
             {
                 return NotFound();
             }
-            var listing = await _repository.Find(id);
+            var listing = await _context.Listings.FindAsync(id);
 
             if (listing != null)
             {
                 Listing = listing;
-                await _repository.Delete(Listing);
+                _context.Listings.Remove(Listing);
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToPage("./Index");

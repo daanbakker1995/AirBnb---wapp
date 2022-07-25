@@ -7,17 +7,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using AirBnb.Data;
 using AirBnb.Models;
-using AirBnb.Repository.Interfaces;
 
 namespace AirBnb.Pages.Listings
 {
     public class CreateModel : PageModel
     {
-        private readonly IListingsRepository _repository;
+        private readonly AirBnb.Data.AirbnbV2Context _context;
 
-        public CreateModel(IListingsRepository listingsRepository)
+        public CreateModel(AirBnb.Data.AirbnbV2Context context)
         {
-            _repository = listingsRepository;
+            _context = context;
         }
 
         public IActionResult OnGet()
@@ -27,17 +26,18 @@ namespace AirBnb.Pages.Listings
 
         [BindProperty]
         public Listing Listing { get; set; } = default!;
-
+        
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid || Listing == null)
+          if (!ModelState.IsValid || _context.Listings == null || Listing == null)
             {
                 return Page();
             }
 
-            await _repository.InsertAsync(Listing);
+            _context.Listings.Add(Listing);
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }

@@ -12,9 +12,9 @@ namespace AirBnb.Pages.Listings
 {
     public class DetailsModel : PageModel
     {
-        private readonly AirBnb.Data.Airbnb2022Context _context;
+        private readonly AirBnb.Data.AirbnbV2Context _context;
 
-        public DetailsModel(AirBnb.Data.Airbnb2022Context context)
+        public DetailsModel(AirBnb.Data.AirbnbV2Context context)
         {
             _context = context;
         }
