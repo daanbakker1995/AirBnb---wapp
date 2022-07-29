@@ -15,9 +15,12 @@ namespace AirBnb.Repository
             _context = context;
         }
 
-        public async Task<IList<TEntity>> GetAllAsync()
+        public async Task<IList<TEntity>> GetAllAsync(int take = 0, int skip = 0)
         {
-            return await _set.AsNoTracking().ToListAsync();
+            var query = _set.AsNoTracking();
+            if (take > 0) query = query.Take(take);
+            if (skip > 0) query = query.Skip(skip);
+            return await query.ToListAsync();
         }
 
         public async Task<TEntity?> Find(params object[] keys)

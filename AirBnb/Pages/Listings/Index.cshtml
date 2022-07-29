@@ -26,7 +26,7 @@
                 @Html.DisplayNameFor(model => model.Listing[0].HostName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].Neighbourhood)
+                @Html.DisplayNameFor(model => model.Listing[0].NeighbourhoodCleansed)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Listing[0].PropertyType)
@@ -47,6 +47,7 @@
         </tr>
     </thead>
     <tbody>
+        <cache expires-after="@TimeSpan.FromSeconds(60)">
         @foreach (var item in Model.Listing)
         {
             <tr>
@@ -63,7 +64,7 @@
                     @Html.DisplayFor(modelItem => item.HostName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Neighbourhood)
+                    @Html.DisplayFor(modelItem => item.NeighbourhoodCleansed)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PropertyType)
@@ -87,5 +88,26 @@
                 </td>
             </tr>
         }
+        </cache>
     </tbody>
 </table>
+@*
+   Razor comment block
+   Start of paginating code in view
+*@
+
+@{
+    var prevDisabled = !Model.Listing.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Listing.HasNextPage ? "disabled" : "";
+}
+
+<a asp-page="./Index"
+   asp-route-pageIndex="@(Model.Listing.PageIndex - 1)"
+   class="btn btn-primary @prevDisabled">
+    Previous
+</a>
+<a asp-page="./Index"
+   asp-route-pageIndex="@(Model.Listing.PageIndex + 1)"
+   class="btn btn-primary @nextDisabled">
+    Next
+</a>

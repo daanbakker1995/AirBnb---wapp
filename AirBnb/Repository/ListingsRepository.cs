@@ -13,17 +13,13 @@ namespace AirBnb.Repository
 
         public async Task<List<GeoData>> GetListingsGeoData(ListingsFilterOptions filterOptions = null)
         {
-            var listings = _set.AsNoTracking(); // TODO: remove take
+            var listings = _set.AsNoTracking();
 
             if (filterOptions != null)
             {
                 if (filterOptions.Neighbourhood != null)
                 {
-                    listings = listings.Where(x => x.Neighbourhood == filterOptions.Neighbourhood);
-                }
-                if (filterOptions.RoomType != null)
-                {
-                    listings = listings.Where(x => x.RoomType == filterOptions.RoomType);
+                    listings = listings.Where(x => x.NeighbourhoodCleansed == filterOptions.Neighbourhood);
                 }
                 if (filterOptions.MinPrice > 0)
                 {
@@ -44,25 +40,16 @@ namespace AirBnb.Repository
             }
 
             var geoDatas = new List<GeoData>();
-            foreach (var item in await listings.Take(100)
-                .Select(l => new { l.Id, l.Name, l.ListingUrl, l.HostId, l.HostName, l.Neighbourhood, l.RoomType, l.NumberOfReviews, l.MinimumNights, l.Price, l.License, l.Latitude,l.Longitude })
+            foreach (var item in await listings
+                .Select(l => new { l.Id, l.RoomType, l.Latitude, l.Longitude })
                 .ToListAsync())
             {
                 var geoData = new GeoData
                 {
                     Properties = new Properties
                     {
-                        ListingId = item.Id,
-                        Listing_url = item.ListingUrl,
-                        Name = item.Name,
-                        HostId = item.HostId,
-                        HostName = item.HostName,
-                        Neighbourhood = item.Neighbourhood,
                         RoomType = item.RoomType,
-                        NumberOfReviews = item.NumberOfReviews ?? default,
-                        MinimunNights = item.MinimumNights ?? default,
-                        Price = item.Price ?? default,
-                        HasLicense = item.License is not null,
+                        ListingId = item.Id,
                     }
                 };
                 geoData.Geometry.Coordinates.Add(item.Longitude.ToString().Replace(",", "."));
@@ -70,6 +57,23 @@ namespace AirBnb.Repository
                 geoDatas.Add(geoData);
             }
             return geoDatas;
+        }
+
+        public async Task<Properties?> GetListingGeoDataById(int id)
+        {
+            return _set.AsNoTracking().Where(l => l.Id == id).Select(l => new Properties
+            {
+                ListingId = l.Id,
+                RoomType = l.RoomType,
+                Listing_url = l.ListingUrl,
+                Name = l.Name,
+                HostId = l.HostId,
+                HostName = l.HostName,
+                Neighbourhood = l.NeighbourhoodCleansed,
+                NumberOfReviews = l.NumberOfReviews ?? default,
+                MinimunNights = l.MinimumNights ?? default,
+                Price = l.Price ?? default,
+            }).FirstOrDefault();
         }
     }
 }

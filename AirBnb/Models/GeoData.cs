@@ -25,7 +25,6 @@
         public int NumberOfReviews { get; set; }
         public int MinimunNights { get; set; }
         public double Price { get; set; }
-        public bool HasLicense { get; set; } = false;
         public string Listing_url { get; internal set; }
     }
 }

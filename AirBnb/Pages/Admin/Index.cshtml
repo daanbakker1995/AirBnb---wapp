@@ -1,0 +1,314 @@
+﻿@page
+@model AirBnb.Pages.Admin.IndexModel
+@{
+
+    ViewData["Title"] = "Admin page";
+}
+
+<div class="container">
+    <div class="row flex-fill d-flex h-100 p-4">
+        <div class="col-4">
+            <h4>Room types</h4>
+            <canvas id="RoomTypeChart">Your browser does not support the canvas element.</canvas>
+        </div>
+        <div class="col-4">
+            <h4>Room types Average price</h4>
+            <canvas id="RoomTypePriceChart">Your browser does not support the canvas element.</canvas>
+        </div>
+        <div class="col-4">
+            <h4>Shortterm listings</h4>
+            <canvas id="ShortRentalsChart">Your browser does not support the canvas element.</canvas>
+        </div>
+    </div>
+    <div class="row flex-fill d-flex h-100 p-4">
+        <div class="col-6 flex-fill">
+            <h4>Listings in neighbourhoods</h4>
+            <canvas id="ListingsNeighbourhoodCharts">Your browser does not support the canvas element.</canvas>
+        </div>
+        <div class="col-6 flex-fill">
+            <h4>Average price in neighbourhoods</h4>
+            <canvas id="AveragePriceNeighbourhoodsCharts">Your browser does not support the canvas element.</canvas>
+        </div>
+    </div>
+    <div class="row flex-fill d-flex h-100 p-4">
+        <div class="col-6 flex-fill">
+            <h4>Top hosts with total listings</h4>
+            <canvas id="TopHostsChart">Your browser does not support the canvas element.</canvas>
+        </div>
+        <div class="col-6">
+            <h4> Top 20 Hosts</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].HostName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].EntireHomeApt)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].PrivateRooms)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].SharedRoom)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].HotelRoom)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].TotalListings)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <cache expires-after="@TimeSpan.FromMilliseconds(60)">
+                    @foreach (var item in Model.StatsModel.TopHostWithListings)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.HostName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.EntireHomeApt)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PrivateRooms)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SharedRoom)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.HotelRoom)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TotalListings)
+                            </td>
+                        </tr>
+                    }
+                    </cache>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const RoomTypeCrt = document.getElementById('RoomTypeChart');
+    const RoomTypePriceCrt = document.getElementById('RoomTypePriceChart');
+    const shortRentalCrt = document.getElementById('ShortRentalsChart');
+    const topHostsCrt = document.getElementById('TopHostsChart');
+    const avgPriceNeighCrt = document.getElementById('AveragePriceNeighbourhoodsCharts');
+    const neighbourhoodListingsCrt = document.getElementById('ListingsNeighbourhoodCharts');
+    const stats = @Json.Serialize(@Model.StatsModel);
+    console.log(stats);
+
+    var hosts = [];
+    var totalListings = [];
+    var topHostsBgColors = [];
+    var averagePriceNeighbourhoods = [];
+    var averagePriceNeighbourhoodsValues = [];
+    var averagePricePerRoomTypes = [];
+    var averagePricePerRoomTypesValues = [];
+    var neighbourhoodListingsLabels = [];
+    var neighbourhoodListingsData = [];
+
+    var FormattedValues = {
+        averagePricePerRoomTypes,
+        averagePricePerRoomTypesValues,
+        averagePriceNeighbourhoods,
+        averagePriceNeighbourhoodsValues,
+    }
+
+    var dynamicColor = function () {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ")";
+    };
+
+    for (var i in stats.topHostWithListings) {
+        topHostsBgColors.push(dynamicColor());
+    }
+
+    for (var i = 0; i < stats.topHostWithListings.length; i++) {
+        hosts.push(stats.topHostWithListings[i]["hostName"])
+        totalListings.push(stats.topHostWithListings[i]["totalListings"])
+    }
+
+    for (var i = 0; i < stats.averagePricePerNeighbourhood.length; i++) {
+        averagePriceNeighbourhoods.push(stats.averagePricePerNeighbourhood[i]["stringValue"])
+        averagePriceNeighbourhoodsValues.push(stats.averagePricePerNeighbourhood[i]["intValue"])
+    }
+
+    for (var i = 0; i < stats.averagePricePerRoomTypes.length; i++) {
+        averagePricePerRoomTypes.push(stats.averagePricePerRoomTypes[i]["stringValue"])
+        averagePricePerRoomTypesValues.push(stats.averagePricePerRoomTypes[i]["intValue"])
+    }
+
+    for (var i = 0; i < stats.listingsPerNeighbourhood.length; i++) {
+        neighbourhoodListingsLabels.push(stats.listingsPerNeighbourhood[i]["stringValue"])
+        neighbourhoodListingsData.push(stats.listingsPerNeighbourhood[i]["intValue"])
+    }
+
+    console.log("FormattedValues", FormattedValues);
+
+    const RoomTypePrice = new Chart(RoomTypePriceCrt, {
+        type: 'pie',
+        data: {
+            labels: averagePricePerRoomTypes,
+            datasets: [{
+                label: 'Room Types',
+                data: averagePricePerRoomTypesValues,
+                backgroundColor: [
+                    'rgba(255, 99, 132)',
+                    'rgba(54, 162, 235)',
+                    'rgba(255, 206, 86)',
+                    'rgba(75, 192, 192)',
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    const RoomType = new Chart(RoomTypeCrt, {
+        type: 'pie',
+        data: {
+            labels: ['Private Room', 'Entire home/apt', 'Shared room', 'Hotel room'],
+            datasets: [{
+                label: 'Room Types',
+                data: [stats.totalRoomTypes["Private room"], stats.totalRoomTypes["Entire home/apt"], stats.totalRoomTypes["Shared room"], stats.totalRoomTypes["Hotel room"]],
+                backgroundColor: [
+                    'rgba(255, 99, 132)',
+                    'rgba(54, 162, 235)',
+                    'rgba(255, 206, 86)',
+                    'rgba(75, 192, 192)',
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const TopHostsChart = new Chart(topHostsCrt, {
+        type: 'bar',
+        data: {
+            labels: hosts,
+            datasets: [{
+                label: 'Top Hosts',
+                data: totalListings,
+                backgroundColor: [
+                    'rgba(255, 99, 132 )',
+                    'rgba(255, 159, 64)',
+                    'rgba(255, 205, 86)',
+                    'rgba(75, 192, 192)',
+                    'rgba(54, 162, 235)',
+                    'rgba(153, 102, 255)',
+                    'rgba(201, 203, 207)'
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const ShortRentals = new Chart(shortRentalCrt, {
+        type: 'doughnut',
+        data: {
+            labels: ['In 30 Days', 'In 60 Days', 'In 90 Days'],
+            datasets: [{
+                label: 'Listings with availability in days',
+                data: [
+                    stats.shortTermRentalsInMonth["In30Days"],
+                    stats.shortTermRentalsInMonth["In60Days"],
+                    stats.shortTermRentalsInMonth["In90Days"]
+                ], backgroundColor: [
+                    'rgba(255, 99, 132)',
+                    'rgba(54, 162, 235)',
+                    'rgba(255, 206, 86)',
+                    'rgba(75, 192, 192)',
+                ],
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const avgPriceNeigh = new Chart(avgPriceNeighCrt, {
+        type: 'bar',
+        data: {
+            labels: averagePriceNeighbourhoods,
+            datasets: [{
+                label: 'Average price in neighbourhoods',
+                data: averagePriceNeighbourhoodsValues,
+                backgroundColor: topHostsBgColors,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    })
+
+    const neighbourhoodListings = new Chart(neighbourhoodListingsCrt, {
+        type: 'bar',
+        data: {
+            labels: neighbourhoodListingsLabels,
+            datasets: [{
+                label: 'Average price in neighbourhoods',
+                data: neighbourhoodListingsData,
+                backgroundColor: topHostsBgColors,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    })
+
+</script>

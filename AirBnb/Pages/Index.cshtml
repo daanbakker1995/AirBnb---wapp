@@ -4,10 +4,15 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="row flex-fill d-flex h-100">
-    <div id='map' class='col-8 h-100' style='min-width: 800px; min-height: 600px;'></div>
+<div class="row flex-fill d-flex">
+    <div class="col">
+        <div id='map'></div>
+    </div>
 
-    <div id="filter" class="col-4 h-100">
+    <div id="filter" class="col-3 h-100 p-4 bg-secondary bg-opacity-25">
+        <div class="col">
+            <h3>Filter map results</h3>
+        </div>
         <form asp-page="./Index" method="get">
             <div class="form-group">
                 <label for="neighbourhoodSelection">Filter by neighbourhood:</label>
@@ -19,35 +24,44 @@
                     }
                 </select>
             </div>
-            <div class="form-group">
-                <label for="MinPrice">Min price:</label>
-                <input type="number" id="MinPrice" name="MinPrice" value="@Model.FilterOptions.MinPrice" />
+            <div class="row">
+                <div class="form-group col">
+                    <label for="MinPrice">Min price:</label>
+                    <input type="number" id="MinPrice" name="MinPrice" class="form-control form-control-sm" value="@Model.FilterOptions.MinPrice" />
+                </div>
+                <div class="form-group col">
+                    <label for="MaxPrice">Max price:</label>
+                    <input type="number" id="MaxPrice" name="MaxPrice" class="form-control form-control-sm" value="@Model.FilterOptions.MaxPrice" />
+                </div>
             </div>
-            <div class="form-group">
-                <label for="MaxPrice">Max price:</label>
-                <input type="number" id="MaxPrice" name="MaxPrice" value="@Model.FilterOptions.MaxPrice" />
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="MinReviews">Min Reviews:</label>
+                    <input type="number" id="MinReviews" name="MinReviews" class="form-control form-control-sm" value="@Model.FilterOptions.MinReviews" />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="MaxReviews">Max Reviews:</label>
+                    <input type="number" id="MaxReviews" name="MaxReviews" class="form-control form-control-sm" value="@Model.FilterOptions.MaxReviews" />
+                </div>
             </div>
-            <div class="form-group">
-                <label for="MinReviews">Min Reviews:</label>
-                <input type="number" id="MinReviews" name="MinReviews" value="@Model.FilterOptions.MinReviews" />
-            </div>
-            <div class="form-group">
-                <label for="MaxReviews">Max Reviews:</label>
-                <input type="number" id="MaxReviews" name="MaxReviews" value="@Model.FilterOptions.MaxReviews" />
-            </div>
-            <div class="form-group">
+            <div class="form-group pt-2">
                 <input type="submit" value="Filter" class="btn btn-primary" />
             </div>
         </form>
     </div>
 
     <script>
+        async function getProperties(id) {
+            const response = await fetch("./api/listing/" + id);
+            return await response.json();
+        }
+
         mapboxgl.accessToken = 'pk.eyJ1IjoicW91eW0iLCJhIjoiY2thNm44MnV3MDhrdzJybDdyZ25taWZzdiJ9.TeswIM_AHz6PsntAVngmIA';
         var data =
         {
             "type": "FeatureCollection",
             "features": @Html.Raw(Json.Serialize(@Model.GeoData))
-                                        };
+        };
 
         console.log(data);
 
@@ -66,8 +80,7 @@
                 type: 'geojson',
                 data: data,
                 cluster: true,
-                clusterMaxZoom: 14, // Max zoom to cluster points on
-                clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+                clusterMaxZoom: 14 // Max zoom to cluster points on
             });
 
             map.addLayer({
@@ -120,7 +133,6 @@
                 source: 'listings',
                 filter: ['!', ['has', 'point_count']],
                 paint: {
-                    //'circle-color': '#3bb2d0',
                     'circle-color': [
                         'match',
                         ['get', 'roomType'],
@@ -132,13 +144,12 @@
                         '#3bb2d0',
                         '#ccc' /* Other */
                     ],
-                    'circle-radius': 8,
+                    'circle-radius': 6,
                     'circle-stroke-width': 1,
                     'circle-stroke-color': '#fff'
                 }
             });
 
-            // inspect a cluster on click
             map.on('click', 'clusters', (e) => {
                 const features = map.queryRenderedFeatures(e.point, {
                     layers: ['clusters']
@@ -157,18 +168,10 @@
                 );
             });
 
-            // When a click event occurs on a feature in
-            // the unclustered-point layer, open a popup at
-            // the location of the feature, with
-            // description HTML from its properties.
-            map.on('click', 'unclustered-point', (e) => {
+            map.on('click', 'unclustered-point', async (e) => {
                 var coordinates = e.features[0].geometry.coordinates.slice();
-                const properties = e.features[0].properties;
-
-                console.log(properties);
-
+                var properties = await getProperties(e.features[0].properties.listingId);
                 var licenceString = properties.hasLicense ? "Yes" : "No";
-
                 new mapboxgl.Popup().setLngLat(coordinates)
                     .setHTML(
                         '<p><strong>' +
@@ -180,7 +183,6 @@
                         '<p>' + properties.roomType + ' in ' + properties.neighbourhood + '</p>' +
                         '<hr>' +
                         '<p>' +
-                        'License: ' + licenceString + '<br>' +
                         'Minimum nights: ' + properties.minimunNights + '<br>' +
                         'Price: ' + properties.price + ' per night' +
                         '</p>'

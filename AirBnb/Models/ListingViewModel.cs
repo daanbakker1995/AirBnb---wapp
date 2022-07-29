@@ -7,7 +7,7 @@
         public int HostId { get; set; }
         public string HostName { get; set; }
 
-        public string Neighbourhood { get; set; }
+        public string NeighbourhoodCleansed { get; set; }
         public string PropertyType { get; set; }
         public string RoomType { get; set; }
         public double? Price { get; set; }
