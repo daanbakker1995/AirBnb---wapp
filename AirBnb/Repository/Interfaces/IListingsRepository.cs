@@ -6,5 +6,6 @@ namespace AirBnb.Repository.Interfaces
     {
         public Task<List<GeoData>> GetListingsGeoData(ListingsFilterOptions filterOptions);
         public Task<Properties?> GetListingGeoDataById(int id);
+        public Task<PaginatedList<ListingViewModel>> GetListingViewModels(int? pageIndex);
     }
 }

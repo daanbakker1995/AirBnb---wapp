@@ -14,41 +14,41 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].Id)
+                @Html.DisplayNameFor(model => model.Listings[0].Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].Name)
+                @Html.DisplayNameFor(model => model.Listings[0].Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].HostId)
+                @Html.DisplayNameFor(model => model.Listings[0].HostId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].HostName)
+                @Html.DisplayNameFor(model => model.Listings[0].HostName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].NeighbourhoodCleansed)
+                @Html.DisplayNameFor(model => model.Listings[0].NeighbourhoodCleansed)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].PropertyType)
+                @Html.DisplayNameFor(model => model.Listings[0].PropertyType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].RoomType)
+                @Html.DisplayNameFor(model => model.Listings[0].RoomType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].Price)
+                @Html.DisplayNameFor(model => model.Listings[0].Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].MinimumNights)
+                @Html.DisplayNameFor(model => model.Listings[0].MinimumNights)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing[0].MaximumNights)
+                @Html.DisplayNameFor(model => model.Listings[0].MaximumNights)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        <cache expires-after="@TimeSpan.FromSeconds(60)">
-        @foreach (var item in Model.Listing)
+        <!--<distributed-cache name="listings-cache" expires-after="@TimeSpan.FromSeconds(60)">-->
+        @foreach (var item in Model.Listings)
         {
             <tr>
                 <td>
@@ -88,7 +88,7 @@
                 </td>
             </tr>
         }
-        </cache>
+        <!--</distributed-cache>-->
     </tbody>
 </table>
 @*
@@ -97,17 +97,17 @@
 *@
 
 @{
-    var prevDisabled = !Model.Listing.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.Listing.HasNextPage ? "disabled" : "";
+    var prevDisabled = !Model.Listings.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Listings.HasNextPage ? "disabled" : "";
 }
 
 <a asp-page="./Index"
-   asp-route-pageIndex="@(Model.Listing.PageIndex - 1)"
+   asp-route-pageIndex="@(Model.Listings.PageIndex - 1)"
    class="btn btn-primary @prevDisabled">
     Previous
 </a>
 <a asp-page="./Index"
-   asp-route-pageIndex="@(Model.Listing.PageIndex + 1)"
+   asp-route-pageIndex="@(Model.Listings.PageIndex + 1)"
    class="btn btn-primary @nextDisabled">
     Next
 </a>

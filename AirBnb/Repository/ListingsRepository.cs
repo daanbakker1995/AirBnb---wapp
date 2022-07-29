@@ -75,5 +75,22 @@ namespace AirBnb.Repository
                 Price = l.Price ?? default,
             }).FirstOrDefault();
         }
+
+        public async Task<PaginatedList<ListingViewModel>> GetListingViewModels(int? pageIndex)
+        {
+            return await PaginatedList<ListingViewModel>.CreateAsync(_set.Select(x => new ListingViewModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                HostId = x.HostId,
+                HostName = x.HostName,
+                NeighbourhoodCleansed = x.NeighbourhoodCleansed,
+                PropertyType = x.PropertyType,
+                RoomType = x.RoomType,
+                Price = x.Price,
+                MinimumNights = x.MinimumNights,
+                MaximumNights = x.MaximumNights
+            }).AsNoTracking(), pageIndex ?? 1, 500);
+        }
     }
 }

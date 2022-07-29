@@ -36,6 +36,12 @@ builder.Services.AddMiniProfiler(options =>
 // Performance action: Register Response  in DI container
 builder.Services.AddResponseCompression();
 
+//builder.Services.AddStackExchangeRedisCache(options =>
+//{
+//    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+//    options.InstanceName = "SampleInstance";
+//});
+
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 
