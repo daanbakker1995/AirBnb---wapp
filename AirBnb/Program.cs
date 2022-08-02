@@ -8,6 +8,7 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using StackExchange.Profiling.Storage;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,6 @@ builder.Services.AddResponseCompression();
 //    options.InstanceName = "SampleInstance";
 //});
 
-builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AirbnbV2Context>(options =>
@@ -77,7 +77,18 @@ if (app.Environment.IsDevelopment())
     app.UseMiniProfiler();
 }
 
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+    context.Response.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7276");
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    await next();
+});
+
+
 app.UseRouting();
+
+app.UseCookiePolicy();
 
 app.UseAuthentication();
 app.UseAuthorization();

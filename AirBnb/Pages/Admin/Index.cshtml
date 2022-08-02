@@ -5,63 +5,62 @@
     ViewData["Title"] = "Admin page";
 }
 
-<div class="container">
-    <div class="row flex-fill d-flex h-100 p-4">
-        <div class="col-4">
-            <h4>Room types</h4>
-            <canvas id="RoomTypeChart">Your browser does not support the canvas element.</canvas>
-        </div>
-        <div class="col-4">
-            <h4>Room types Average price</h4>
-            <canvas id="RoomTypePriceChart">Your browser does not support the canvas element.</canvas>
-        </div>
-        <div class="col-4">
-            <h4>Shortterm listings</h4>
-            <canvas id="ShortRentalsChart">Your browser does not support the canvas element.</canvas>
-        </div>
+<div class="row flex-fill d-flex h-100 p-4">
+    <div class="col-4">
+        <h4>Room types</h4>
+        <canvas id="RoomTypeChart">Your browser does not support the canvas element.</canvas>
     </div>
-    <div class="row flex-fill d-flex h-100 p-4">
-        <div class="col-6 flex-fill">
-            <h4>Listings in neighbourhoods</h4>
-            <canvas id="ListingsNeighbourhoodCharts">Your browser does not support the canvas element.</canvas>
-        </div>
-        <div class="col-6 flex-fill">
-            <h4>Average price in neighbourhoods</h4>
-            <canvas id="AveragePriceNeighbourhoodsCharts">Your browser does not support the canvas element.</canvas>
-        </div>
+    <div class="col-4">
+        <h4>Room types Average price</h4>
+        <canvas id="RoomTypePriceChart">Your browser does not support the canvas element.</canvas>
     </div>
-    <div class="row flex-fill d-flex h-100 p-4">
-        <div class="col-6 flex-fill">
-            <h4>Top hosts with total listings</h4>
-            <canvas id="TopHostsChart">Your browser does not support the canvas element.</canvas>
-        </div>
-        <div class="col-6">
-            <h4> Top 20 Hosts</h4>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>
-                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].HostName)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].EntireHomeApt)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].PrivateRooms)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].SharedRoom)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].HotelRoom)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].TotalListings)
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <cache expires-after="@TimeSpan.FromMilliseconds(60)">
+    <div class="col-4">
+        <h4>Shortterm listings</h4>
+        <canvas id="ShortRentalsChart">Your browser does not support the canvas element.</canvas>
+    </div>
+</div>
+<div class="row flex-fill d-flex h-100 p-4">
+    <div class="col-6 flex-fill">
+        <h4>Listings in neighbourhoods</h4>
+        <canvas id="ListingsNeighbourhoodCharts">Your browser does not support the canvas element.</canvas>
+    </div>
+    <div class="col-6 flex-fill">
+        <h4>Average price in neighbourhoods</h4>
+        <canvas id="AveragePriceNeighbourhoodsCharts">Your browser does not support the canvas element.</canvas>
+    </div>
+</div>
+<div class="row flex-fill d-flex h-100 p-4">
+    <div class="col-6 flex-fill">
+        <h4>Top hosts with total listings</h4>
+        <canvas id="TopHostsChart">Your browser does not support the canvas element.</canvas>
+    </div>
+    <div class="col-6">
+        <h4> Top 20 Hosts</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].HostName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].EntireHomeApt)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].PrivateRooms)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].SharedRoom)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].HotelRoom)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StatsModel.TopHostWithListings[0].TotalListings)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <cache expires-after="@TimeSpan.FromMilliseconds(60)">
                     @foreach (var item in Model.StatsModel.TopHostWithListings)
                     {
                         <tr>
@@ -85,10 +84,9 @@
                             </td>
                         </tr>
                     }
-                    </cache>
-                </tbody>
-            </table>
-        </div>
+                </cache>
+            </tbody>
+        </table>
     </div>
 </div>
 

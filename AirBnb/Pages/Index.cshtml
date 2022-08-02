@@ -13,16 +13,30 @@
         <div class="col">
             <h3>Filter map results</h3>
         </div>
-        <form asp-page="./Index" method="get">
+        <form asp-page="./Index"  method="post">
             <div class="form-group">
                 <label for="neighbourhoodSelection">Filter by neighbourhood:</label>
-                <select name="neighbourhood" class="form-control" id="neighbourhoodSelection" value="@Model.FilterOptions.Neighbourhood">
-                    <option>Amsterdam</option>
+                <select name="neighbourhood" class="form-control" id="neighbourhoodSelection">
+                    <option selected="@(Model.FilterOptions.Neighbourhood == ""? "true": "false")">Amsterdam</option>
                     @foreach (var neighbourhood in Model.Neighbourhoods)
                     {
-                        <option>@Html.DisplayFor(modelItem => neighbourhood)</option>
+                        if (neighbourhood == Model.FilterOptions.Neighbourhood)
+                        {
+                            <option selected>@Html.DisplayFor(modelItem => neighbourhood)</option>
+                        }
+                        else
+                        {
+
+                            <option>@Html.DisplayFor(modelItem => neighbourhood)</option>
+                        }
                     }
                 </select>
+            </div>
+            <div class="row">
+                <div class="form-group col">
+                    <label for="Limit">Limit results:</label>
+                    <input type="number" id="Limit" name="Limit" class="form-control" value="@Model.FilterOptions.Limit" />
+                </div>
             </div>
             <div class="row">
                 <div class="form-group col">
@@ -61,7 +75,7 @@
         {
             "type": "FeatureCollection",
             "features": @Html.Raw(Json.Serialize(@Model.GeoData))
-        };
+                };
 
         console.log(data);
 

@@ -1,11 +1,13 @@
 ﻿using AirBnb.Models;
 using AirBnb.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirBnb.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class ListingController : ControllerBase
     {
         private readonly IListingsRepository _listingsRepository;

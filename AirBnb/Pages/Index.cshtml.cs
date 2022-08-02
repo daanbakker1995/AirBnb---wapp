@@ -4,9 +4,11 @@ using AirBnb.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace AirBnb.Pages
 {
+    [ValidateAntiForgeryToken]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
@@ -26,10 +28,20 @@ namespace AirBnb.Pages
 
         public async Task OnGetAsync(ListingsFilterOptions options)
         {
+            await GetData(options);
+        }
+
+        public async Task OnPostAsync(ListingsFilterOptions options)
+        {
+            await GetData(options);
+        }
+
+        private async Task GetData(ListingsFilterOptions options)
+        {
             if (options.Neighbourhood == "Amsterdam") options.Neighbourhood = default;
             FilterOptions = options;
-            GeoData = await _listingsRepository.GetListingsGeoData(options);
             Neighbourhoods = await _neighbourhoodsRepository.GetNeighbourhoodsList();
+            GeoData = await _listingsRepository.GetListingsGeoData(options);
         }
     }
 }

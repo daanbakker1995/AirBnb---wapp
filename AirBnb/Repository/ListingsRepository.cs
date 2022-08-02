@@ -37,6 +37,10 @@ namespace AirBnb.Repository
                 {
                     listings = listings.Where(x => x.NumberOfReviews < filterOptions.MaxReviews);
                 }
+                if (filterOptions.Limit > 0)
+                {
+                    listings = listings.Take(filterOptions.Limit);
+                }
             }
 
             var geoDatas = new List<GeoData>();
