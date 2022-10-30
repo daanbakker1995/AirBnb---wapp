@@ -9,11 +9,13 @@ using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using StackExchange.Profiling.Storage;
 using Microsoft.AspNetCore.Mvc;
+using AirBnb.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAdB2C"));
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAdB2C"));
 
 builder.Services.AddAuthorization(options =>
 {
@@ -52,6 +54,12 @@ builder.Services.AddScoped<IListingsRepository, ListingsRepository>();
 builder.Services.AddScoped<INeighbourhoodsRepository, NeighbourhoodsRepository>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 
+// Options pattern in ASP.NET Core: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-6.0
+builder.Services.AddOptions();
+builder.Services.Configure<MapBoxSettings>(
+    builder.Configuration.GetSection("Mapbox"));
+
+
 var app = builder.Build();
 
 // Performance action: Add response compression to Middleware
@@ -79,9 +87,16 @@ if (app.Environment.IsDevelopment())
 
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
     context.Response.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7276");
+    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Remove("X-Powered-By");
+    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self' airbnb20220801163836.azurewebsites.net; " +
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' api.mapbox.com cdnjs.cloudflare.com airbnb20220801163836.azurewebsites.net;" +
+        "style-src 'self' 'unsafe-inline' api.mapbox.com ;" +
+        "img-src 'self' data:;" +
+        "worker-src 'self' blob:;" +
+        "connect-src 'self' api.mapbox.com events.mapbox.com;");
     await next();
 });
 
@@ -89,7 +104,6 @@ app.Use(async (context, next) =>
 app.UseRouting();
 
 app.UseCookiePolicy();
-
 app.UseAuthentication();
 app.UseAuthorization();
 

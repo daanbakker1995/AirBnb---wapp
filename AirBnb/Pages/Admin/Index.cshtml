@@ -98,7 +98,6 @@
     const avgPriceNeighCrt = document.getElementById('AveragePriceNeighbourhoodsCharts');
     const neighbourhoodListingsCrt = document.getElementById('ListingsNeighbourhoodCharts');
     const stats = @Json.Serialize(@Model.StatsModel);
-    console.log(stats);
 
     var hosts = [];
     var totalListings = [];
@@ -147,8 +146,6 @@
         neighbourhoodListingsLabels.push(stats.listingsPerNeighbourhood[i]["stringValue"])
         neighbourhoodListingsData.push(stats.listingsPerNeighbourhood[i]["intValue"])
     }
-
-    console.log("FormattedValues", FormattedValues);
 
     const RoomTypePrice = new Chart(RoomTypePriceCrt, {
         type: 'pie',

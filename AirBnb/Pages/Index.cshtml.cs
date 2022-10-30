@@ -1,6 +1,7 @@
 ﻿using AirBnb.Models;
 using AirBnb.Repository.Interfaces;
 using AirBnb.Service;
+using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,17 @@ namespace AirBnb.Pages
         private readonly INeighbourhoodsRepository _neighbourhoodsRepository;
         private readonly IListingsRepository _listingsRepository;
 
+        public string AccessToken { get; }
         public List<GeoData> GeoData { get; set; } = new List<GeoData>();
         public List<string> Neighbourhoods { get; set; } = new List<string>();
         public ListingsFilterOptions FilterOptions { get; set; } = new ListingsFilterOptions();
 
-        public IndexModel(ILogger<IndexModel> logger, IListingsRepository listingsRepository, INeighbourhoodsRepository neighbourhoodsRepository, IStatisticsService service)
+        public IndexModel(ILogger<IndexModel> logger, IListingsRepository listingsRepository, INeighbourhoodsRepository neighbourhoodsRepository, IStatisticsService service, IOptions<MapBoxSettings> mapboxSettings)
         {
             _logger = logger;
             _neighbourhoodsRepository = neighbourhoodsRepository;
             _listingsRepository = listingsRepository;
+            AccessToken = mapboxSettings.Value.AccessToken;
         }
 
         public async Task OnGetAsync(ListingsFilterOptions options)

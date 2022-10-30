@@ -44,9 +44,8 @@ namespace AirBnb.Repository
             }
 
             var geoDatas = new List<GeoData>();
-            foreach (var item in await listings
-                .Select(l => new { l.Id, l.RoomType, l.Latitude, l.Longitude })
-                .ToListAsync())
+            foreach (var item in listings
+                .Select(l => new { l.Id, l.RoomType, l.Latitude, l.Longitude }))
             {
                 var geoData = new GeoData
                 {
@@ -65,7 +64,7 @@ namespace AirBnb.Repository
 
         public async Task<Properties?> GetListingGeoDataById(int id)
         {
-            return _set.AsNoTracking().Where(l => l.Id == id).Select(l => new Properties
+            return await _set.AsNoTracking().Where(l => l.Id == id).Select(l => new Properties
             {
                 ListingId = l.Id,
                 RoomType = l.RoomType,
@@ -77,7 +76,7 @@ namespace AirBnb.Repository
                 NumberOfReviews = l.NumberOfReviews ?? default,
                 MinimunNights = l.MinimumNights ?? default,
                 Price = l.Price ?? default,
-            }).FirstOrDefault();
+            }).FirstOrDefaultAsync();
         }
 
         public async Task<PaginatedList<ListingViewModel>> GetListingViewModels(int? pageIndex)

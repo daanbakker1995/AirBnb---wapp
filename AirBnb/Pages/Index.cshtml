@@ -18,6 +18,7 @@
                 <label for="neighbourhoodSelection">Filter by neighbourhood:</label>
                 <select name="neighbourhood" class="form-control" id="neighbourhoodSelection">
                     <option selected="@(Model.FilterOptions.Neighbourhood == ""? "true": "false")">Amsterdam</option>
+                    <option disabled>Sub regions</option>
                     @foreach (var neighbourhood in Model.Neighbourhoods)
                     {
                         if (neighbourhood == Model.FilterOptions.Neighbourhood)
@@ -64,20 +65,18 @@
         </form>
     </div>
 
-    <script>
+    <script defer>
         async function getProperties(id) {
             const response = await fetch("./api/listing/" + id);
             return await response.json();
         }
 
-        mapboxgl.accessToken = 'pk.eyJ1IjoicW91eW0iLCJhIjoiY2thNm44MnV3MDhrdzJybDdyZ25taWZzdiJ9.TeswIM_AHz6PsntAVngmIA';
+        mapboxgl.accessToken = @Html.Raw(Json.Serialize(@Model.AccessToken));
         var data =
         {
             "type": "FeatureCollection",
             "features": @Html.Raw(Json.Serialize(@Model.GeoData))
                 };
-
-        console.log(data);
 
         const map = new mapboxgl.Map({
             container: 'map',
