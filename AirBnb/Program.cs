@@ -3,20 +3,18 @@ using AirBnb.Data;
 using AirBnb.Repository;
 using AirBnb.Repository.Interfaces;
 using AirBnb.Service;
-using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using StackExchange.Profiling.Storage;
-using Microsoft.AspNetCore.Mvc;
 using AirBnb.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// AUTHENTICATION
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAdB2C"));
-
 builder.Services.AddAuthorization(options =>
 {
     // By default, all incoming requests will be authorized according to 
@@ -28,7 +26,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToPage("/Index");
 }).AddMvcOptions(Options => { }).AddMicrosoftIdentityUI();
 
-
+// MINIPROFILER
 builder.Services.AddMiniProfiler(options =>
 {
     options.PopupRenderPosition = StackExchange.Profiling.RenderPosition.BottomLeft;
@@ -36,6 +34,7 @@ builder.Services.AddMiniProfiler(options =>
     options.Storage = new SqlServerStorage(builder.Configuration.GetConnectionString("MiniProfilerDatabase"));
 }).AddEntityFramework();
 
+// OPTIMALISATION
 // Performance action: Register Response  in DI container
 builder.Services.AddResponseCompression();
 builder.Services.AddResponseCaching();
@@ -44,21 +43,20 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
     options.InstanceName = "SampleInstance";
 });
-
+// ADD CONTROLLERS
 builder.Services.AddControllers();
-
+// DATABASE
 builder.Services.AddDbContext<AirbnbV2Context>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("Airbnb_v2Context") ?? throw new InvalidOperationException("Connection string 'AirbnbV2Context' not found.")));
-
+// DEPENDENCY INJECTIONS
 builder.Services.AddScoped<IListingsRepository, ListingsRepository>();
 builder.Services.AddScoped<INeighbourhoodsRepository, NeighbourhoodsRepository>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 
-// Options pattern in ASP.NET Core: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-6.0
+// OTPTIONS PATTERN Options pattern in ASP.NET Core: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-6.0
 builder.Services.AddOptions();
 builder.Services.Configure<MapBoxSettings>(
     builder.Configuration.GetSection("Mapbox"));
-
 
 var app = builder.Build();
 
@@ -81,11 +79,14 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// USE MINIPROFILER
 if (app.Environment.IsDevelopment())
 {
     app.UseMiniProfiler();
 }
 
+
+// OWASP RESPONSE HEADERS
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7276");
