@@ -22,36 +22,10 @@ namespace AirBnb.Repository
 
         public async Task<IList<TEntity>> GetAllAsync(int take = 0, int skip = 0)
         {
-            var cacheKey = $"GET_ALL_SKIP_{skip}_TAKE_{take}";
-            var result = new List<TEntity>();
-
-            var cachedData = await _cache.GetAsync(cacheKey);
-            if (cachedData != null)
-            {
-                // If data found in cache, encode and deserialize cached data
-                var cachedDataValue = Encoding.UTF8.GetString(cachedData);
-                result = JsonConvert.DeserializeObject<List<TEntity>>(cachedDataValue);
-                return result;
-            }
-
             var query = _set.AsNoTracking();
             if (take > 0) query = query.Take(take);
             if (skip > 0) query = query.Skip(skip);
-            var enities = await query.ToListAsync();
-
-            // serialize data
-            var cachedDataEntities = JsonConvert.SerializeObject(enities);
-            var newDataToCache = Encoding.UTF8.GetBytes(cachedDataEntities);
-
-            // set cache options 
-            var options = new DistributedCacheEntryOptions()
-                .SetAbsoluteExpiration(DateTime.Now.AddMinutes(2))
-                .SetSlidingExpiration(TimeSpan.FromMinutes(1));
-
-            // Add data in cache
-            await _cache.SetAsync(cacheKey, newDataToCache, options);
-
-            return enities;
+            return await query.ToListAsync();
         }
 
         public async Task<TEntity?> Find(params object[] keys)
