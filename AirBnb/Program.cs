@@ -38,12 +38,12 @@ builder.Services.AddMiniProfiler(options =>
 
 // Performance action: Register Response  in DI container
 builder.Services.AddResponseCompression();
-
-//builder.Services.AddStackExchangeRedisCache(options =>
-//{
-//    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
-//    options.InstanceName = "SampleInstance";
-//});
+builder.Services.AddResponseCaching();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+    options.InstanceName = "SampleInstance";
+});
 
 builder.Services.AddControllers();
 
@@ -64,6 +64,7 @@ var app = builder.Build();
 
 // Performance action: Add response compression to Middleware
 app.UseResponseCompression();
+app.UseResponseCaching();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

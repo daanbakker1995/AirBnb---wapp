@@ -2,6 +2,7 @@
 using AirBnb.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace AirBnb.Controller
 {
@@ -12,7 +13,7 @@ namespace AirBnb.Controller
     {
         private readonly IListingsRepository _listingsRepository;
 
-        public ListingController(IListingsRepository listingsRepository)
+        public ListingController(IListingsRepository listingsRepository, IDistributedCache cache)
         {
             _listingsRepository = listingsRepository;
         }

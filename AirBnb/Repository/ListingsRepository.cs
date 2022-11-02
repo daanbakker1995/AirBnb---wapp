@@ -2,64 +2,98 @@
 using AirBnb.Models;
 using AirBnb.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace AirBnb.Repository
 {
     public class ListingsRepository : BaseRepository<Listing>, IListingsRepository
     {
-        public ListingsRepository(AirbnbV2Context context) : base(context)
+        private readonly IDistributedCache _cache;
+        public ListingsRepository(AirbnbV2Context context, IDistributedCache cache) : base(context, cache)
         {
+            _cache = cache;
         }
 
         public async Task<List<GeoData>> GetListingsGeoData(ListingsFilterOptions filterOptions = null)
         {
-            var listings = _set.AsNoTracking();
+            var cacheKey = "GET_ALL_LISTINGS" + filterOptions.ToString();
+            var GeoData = new List<GeoData>();
 
-            if (filterOptions != null)
+            // Get data from cache
+            var cachedData = await _cache.GetAsync(cacheKey);
+            if (cachedData != null)
             {
-                if (filterOptions.Neighbourhood != null)
-                {
-                    listings = listings.Where(x => x.NeighbourhoodCleansed == filterOptions.Neighbourhood);
-                }
-                if (filterOptions.MinPrice > 0)
-                {
-                    listings = listings.Where(x => x.Price > filterOptions.MinPrice);
-                }
-                if (filterOptions.MaxPrice > 0)
-                {
-                    listings = listings.Where(x => x.Price < filterOptions.MaxPrice);
-                }
-                if (filterOptions.MinReviews > 0)
-                {
-                    listings = listings.Where(x => x.NumberOfReviews > filterOptions.MinReviews);
-                }
-                if (filterOptions.MaxReviews > 0)
-                {
-                    listings = listings.Where(x => x.NumberOfReviews < filterOptions.MaxReviews);
-                }
-                if (filterOptions.Limit > 0)
-                {
-                    listings = listings.Take(filterOptions.Limit);
-                }
+                // If data found in cache, encode and deserialize cached data
+                var cachedDataString = Encoding.UTF8.GetString(cachedData);
+                GeoData = JsonConvert.DeserializeObject<List<GeoData>>(cachedDataString);
             }
-
-            var geoDatas = new List<GeoData>();
-            foreach (var item in listings
-                .Select(l => new { l.Id, l.RoomType, l.Latitude, l.Longitude }))
+            else
             {
-                var geoData = new GeoData
+                var listings = _set.AsNoTracking();
+                if (filterOptions != null)
                 {
-                    Properties = new Properties
+                    if (filterOptions.Neighbourhood != null)
                     {
-                        RoomType = item.RoomType,
-                        ListingId = item.Id,
+                        listings = listings.Where(x => x.NeighbourhoodCleansed == filterOptions.Neighbourhood);
                     }
-                };
-                geoData.Geometry.Coordinates.Add(item.Longitude.ToString().Replace(",", "."));
-                geoData.Geometry.Coordinates.Add(item.Latitude.ToString().Replace(",", "."));
-                geoDatas.Add(geoData);
+                    if (filterOptions.MinPrice > 0)
+                    {
+                        listings = listings.Where(x => x.Price > filterOptions.MinPrice);
+                    }
+                    if (filterOptions.MaxPrice > 0)
+                    {
+                        listings = listings.Where(x => x.Price < filterOptions.MaxPrice);
+                    }
+                    if (filterOptions.MinReviews > 0)
+                    {
+                        listings = listings.Where(x => x.NumberOfReviews > filterOptions.MinReviews);
+                    }
+                    if (filterOptions.MaxReviews > 0)
+                    {
+                        listings = listings.Where(x => x.NumberOfReviews < filterOptions.MaxReviews);
+                    }
+                    if (filterOptions.Limit > 0)
+                    {
+                        listings = listings.Take(filterOptions.Limit);
+                    }
+                }
+
+                var geoDatas = new List<GeoData>();
+
+                foreach (var item in listings
+                    .Select(l => new { l.Id, l.RoomType, l.Latitude, l.Longitude }))
+                {
+                    var geoData = new GeoData
+                    {
+                        Properties = new Properties
+                        {
+                            RoomType = item.RoomType,
+                            ListingId = item.Id,
+                        }
+                    };
+                    geoData.Geometry.Coordinates.Add(item.Longitude.ToString().Replace(",", "."));
+                    geoData.Geometry.Coordinates.Add(item.Latitude.ToString().Replace(",", "."));
+                    geoDatas.Add(geoData);
+                }
+
+                GeoData = geoDatas;
+
+                // serialize data
+                var cachedDataString = JsonConvert.SerializeObject(geoDatas);
+                var newDataToCache = Encoding.UTF8.GetBytes(cachedDataString);
+
+                // set cache options 
+                var options = new DistributedCacheEntryOptions()
+                    .SetAbsoluteExpiration(DateTime.Now.AddMinutes(5))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(1));
+
+                // Add data in cache
+                await _cache.SetAsync(cacheKey, newDataToCache, options);
             }
-            return geoDatas;
+
+            return GeoData;
         }
 
         public async Task<Properties?> GetListingGeoDataById(int id)

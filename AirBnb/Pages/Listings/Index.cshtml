@@ -47,48 +47,48 @@
         </tr>
     </thead>
     <tbody>
-        <!--<distributed-cache name="listings-cache" expires-after="@TimeSpan.FromSeconds(60)">-->
-        @foreach (var item in Model.Listings)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HostId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HostName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NeighbourhoodCleansed)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PropertyType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RoomType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MinimumNights)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MaximumNights)
-                </td>
-                <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-        <!--</distributed-cache>-->
+        <distributed-cache name="listings-cache" expires-after="@TimeSpan.FromSeconds(60)">
+            @foreach (var item in Model.Listings)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HostId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HostName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NeighbourhoodCleansed)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PropertyType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RoomType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MinimumNights)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MaximumNights)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </distributed-cache>
     </tbody>
 </table>
 @*
